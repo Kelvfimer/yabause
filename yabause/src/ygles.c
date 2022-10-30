@@ -3468,13 +3468,14 @@ void YglSetVdp2Window()
       glDrawArrays(GL_TRIANGLE_STRIP, 0, _Ygl->win1_vertexcnt);
     }
 
-    // 8. sprite window
-    if (bspwin)
-    {
-      glStencilMask(0x04);
-      glStencilFunc(GL_ALWAYS, 0x04, 0x04);
-      YglRenderFrameBufferShadow();
-    }
+      // 8. sprite window
+      if (bspwin) {
+        glStencilMask(0x04);
+        glStencilFunc(GL_ALWAYS, 0x04, 0x04);
+        YglRenderFrameBufferShadow();
+        glBindTexture(GL_TEXTURE_2D, YglTM->textureID_in[YglTM->current]);
+        glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
+      }
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDepthMask(GL_TRUE);
