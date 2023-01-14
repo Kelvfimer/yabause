@@ -311,7 +311,7 @@ const GLchar Yglprg_normal_cram_f[] =
 "{\n"
 "  vec4 txindex = texelFetch( s_texture, ivec2(int(v_texcoord.x),int(v_texcoord.y)) ,0 );\n"
 "  if(txindex.a == 0.0) { discard; }\n"
-"  vec4 txcol = texelFetch( s_color,  ivec2( ( int(round(txindex.g*65280.0)) | int(round(txindex.r*255.0)) ) ,0 )  , 0 );\n"
+"  vec4 txcol = texelFetch( s_color,  ivec2( ( int(txindex.g*65280.0) | int(txindex.r*255.0)) ,0 )  , 0 );\n"
 "  fragColor = clamp(txcol+u_color_offset,vec4(0.0),vec4(1.0));\n"
 "  fragColor.a = txindex.a;\n"
 "}\n";
@@ -333,7 +333,7 @@ const GLchar Yglprg_normal_cram_special_priority_f[] =
 "{\n"
 "  vec4 txindex = texelFetch( s_texture, ivec2(int(v_texcoord.x),int(v_texcoord.y)) ,0 );\n"
 "  if(txindex.a == 0.0) { discard; }\n"
-"  vec4 txcol = texelFetch( s_color,  ivec2( (  int(round(txindex.g*65280.0)) | int(round(txindex.r*255.0))) ,0 )  , 0 );\n"
+"  vec4 txcol = texelFetch( s_color,  ivec2( ( int(txindex.g*65280.0) | int(txindex.r*255.0)) ,0 )  , 0 );\n"
 "  fragColor = clamp(txcol+u_color_offset,vec4(0.0),vec4(1.0));\n"
 "  fragColor.a = txindex.a;\n"
 "  gl_FragDepth = ((txindex.b*255.0/10.0) +1.0)/2.0 ; \n"
@@ -422,7 +422,7 @@ const GLchar Yglprg_normal_cram_special_priority_colf_f[] =
 "{\n"
 "  vec4 txindex = texelFetch( s_texture, ivec2(int(v_texcoord.x),int(v_texcoord.y)) ,0 );\n"
 "  if(txindex.a == 0.0) { discard; }\n"
-"  vec4 txcol = texelFetch( s_color,  ivec2( ( int(round(txindex.g*65280.0)) | int(round(txindex.r*255.0)) ) ,0 )  , 0 );\n"
+"  vec4 txcol = texelFetch( s_color,  ivec2( ( int(txindex.g*65280.0) | int(txindex.r*255.0)) ,0 )  , 0 );\n"
 "  vec4 color_offset = texelFetch( s_linetexture, ivec2( int(v_texcoord.q), 0), 0 ); \n"
 "  fragColor.r = txcol.r + (color_offset.r-0.5)*2.0;\n"
 "  fragColor.g = txcol.g + (color_offset.g-0.5)*2.0;\n"
@@ -481,7 +481,7 @@ const GLchar Yglprg_normal_cram_addcol_f[] =
 "{\n"
 "  vec4 txindex = texelFetch( s_texture, ivec2(int(v_texcoord.x),int(v_texcoord.y)) ,0 );\n"
 "  if(txindex.a == 0.0) { discard; }\n"
-"  vec4 txcol = texelFetch( s_color,  ivec2( ( int(round(txindex.g*65280.0)) | int(round(txindex.r*255.0)) ) ,0 )  , 0 );\n"
+"  vec4 txcol = texelFetch( s_color,  ivec2( ( int(txindex.g*65280.0) | int(txindex.r*255.0)) ,0 )  , 0 );\n"
 "  fragColor = txcol+u_color_offset;\n"
 "  if( txindex.a > 0.5) { fragColor.a = 1.0;} else {fragColor.a = 0.0;}\n"
 "}\n";
@@ -567,14 +567,14 @@ const GLchar Yglprg_rgb_cram_line_f[] =
 "{\n"
 "  vec4 txindex = texelFetch( s_texture, ivec2(int(v_texcoord.x),int(v_texcoord.y)) ,0 );         \n"
 "  if(txindex.a > 0.0) {\n"
-"    highp int highg = int(round(txindex.g*255.0));"
-"    vec4 txcol = texelFetch( s_color, ivec2( ((highg&0x7F)<<8) | int(round(txindex.r*255.0)) , 0 ) , 0 );\n"
+"    highp int highg = int(txindex.g*255.0);"
+"    vec4 txcol = texelFetch( s_color, ivec2( ((highg&0x7F)<<8) | int(txindex.r*255.0) , 0 ) , 0 );\n"
 "    txcol.a = txindex.a; \n"
 "    if( (highg & 0x80)  != 0) {\n"
-"      int coef = int(round(txindex.b*255.0));\n"
+"      int coef = int(txindex.b*255.0);\n"
 "      vec4 linecol;\n"
 "      vec4 lineindex = texelFetch( s_line_texture,  ivec2( int(v_texcoord.z),int(v_texcoord.w))  ,0 );\n"
-"      int lineparam = (( int(round(lineindex.g*255.0)) & 0x7F)<<8) | int(round(lineindex.r*255.0)) ; \n"
+"      int lineparam = ((int(lineindex.g*255.0) & 0x7F)<<8) | int(lineindex.r*255.0); \n"
 "      if( (coef & 0x80) != 0 ){\n"
 "        int caddr = (lineparam&0x780) | (coef&0x7F);\n "
 "        linecol = texelFetch( s_color, ivec2( caddr,0  ) , 0 );\n"
@@ -1341,7 +1341,7 @@ const GLchar Yglprg_vdp1_gouraudshading_hf_f[] =
       "  vec4 spriteColor = texture(u_sprite,addr);                                               \n"
       "  if( spriteColor.a == 0.0 ) discard;                                                          \n"
       "  vec4 fboColor    = texture(u_fbo,faddr);                                                 \n"
-      "  int additional = int(round(fboColor.a * 255.0));\n"
+      "  int additional = int(fboColor.a * 255.0);\n"
       "  spriteColor += vec4(v_vtxcolor.r,v_vtxcolor.g,v_vtxcolor.b,0.0);\n"
       "  if( (additional & 0x40) == 0 ) \n"
       "  { \n"
@@ -1406,7 +1406,7 @@ const GLchar Yglprg_vdp1_halftrans_f[] =
       "  vec4 spriteColor = texture(u_sprite,addr);                                               \n"
       "  if( spriteColor.a == 0.0 ) discard;                                                          \n"
       "  vec4 fboColor    = texture(u_fbo,faddr);                                                 \n"
-      "  int additional = int(round(fboColor.a * 255.0));\n"
+      "  int additional = int(fboColor.a * 255.0);\n"
       "  if( (additional & 0x40) == 0 ) \n"
       "  {                                                                                          \n"
       "    fragColor = spriteColor*0.5 + fboColor*0.5;                                           \n"
@@ -1619,7 +1619,7 @@ const GLchar Yglprg_vdp1_shadow_f[] =
 "  vec4 spriteColor = texture(u_sprite,addr);\n"
 "  if( spriteColor.a == 0.0 ){ discard; }\n"
 "  vec4 fboColor = texture(u_fbo,faddr);\n"
-"  int additional = int(round(fboColor.a * 255.0));\n"
+"  int additional = int(fboColor.a * 255.0);\n"
 "  if( ((additional & 0xC0)==0x80) ) { \n"
 "    fragColor = vec4(fboColor.r*0.5,fboColor.g*0.5,fboColor.b*0.5,fboColor.a);\n"
 "  }else{\n"
@@ -1772,7 +1772,7 @@ const GLchar Yglprg_vdp2_drawfb_f[] =
 "{\n"
 "  vec2 addr = v_texcoord;\n"
 "  highp vec4 fbColor = texture(s_vdp1FrameBuffer,addr);\n"
-"  int additional = int(round(fbColor.a * 255.0));\n"
+"  int additional = int(fbColor.a * 255.0);\n"
 "  highp float alpha = float((additional/8)*8)/255.0;\n"
 "  highp float depth = (float(additional&0x07)/10.0) + 0.05;\n"
 "  if( depth < u_from || depth > u_to ){\n"
@@ -1823,17 +1823,35 @@ const GLchar Yglprg_vdp2_drawfb_cram_vulkan_f[] =
 " int u_sprite_window; \n"
 " float u_from;\n"
 " float u_to;\n"
+" int u_dir;\n"
 "}; \n"
 "layout(binding = 1) uniform highp sampler2D s_vdp1FrameBuffer;\n"
 "layout(binding = 2) uniform sampler2D s_color; \n"
 "layout(binding = 3) uniform sampler2D s_line; \n"
 "layout(location = 0) in vec2 v_texcoord;\n"
 "layout(location = 0) out vec4 fragColor;\n"
+"int getLinePos( int dir ){\n"
+"  switch(dir){\n"
+"    case 1: // 90\n"
+"      return int((u_vheight - gl_FragCoord.x-u_viewport_offset) * u_emu_height);\n"
+"      break;\n"
+"    case 2: // 270\n"
+"      return int((gl_FragCoord.x-u_viewport_offset) * u_emu_height);\n"
+"      break;\n"
+"    case 3: // 180\n"
+"      return int((u_vheight - gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"      break;\n"
+"    default:\n"
+"      return int((gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"      break;\n"
+"  }\n"
+"  return 0;\n"
+"}\n"
 "void main()\n"
 "{\n"
 "  vec2 addr = v_texcoord;\n"
 "  highp vec4 fbColor = texture(s_vdp1FrameBuffer,addr);\n"
-"  int additional = int(round(fbColor.a * 255.0));\n"
+"  int additional = int(fbColor.a * 255.0);\n"
 "  if( (additional & 0x80) == 0 ){ discard; } // show? \n"
 "  int prinumber = (additional&0x07);\n"
 "  highp float depth = u_pri[ prinumber ];\n"
@@ -1841,7 +1859,7 @@ const GLchar Yglprg_vdp2_drawfb_cram_vulkan_f[] =
 "  vec4 txcol=vec4(0.0,0.0,0.0,1.0);\n"
 "  if( (additional & 0x40) != 0 ){  // index color? \n"
 "    if( fbColor.b != 0.0 ) {discard;} // draw shadow last path \n"
-"    int colindex = ( int(round(fbColor.g*65280.0)) | int(round(fbColor.r*255.0))); \n"
+"    int colindex = ( int(fbColor.g*65280.0) | int(fbColor.r*255.0)); \n"
 "    if( colindex == 0 ){ if( u_sprite_window != 0 || prinumber == 0) { discard;} } // hard/vdp1/hon/p02_11.htm 0 data is ignoerd \n"
 "    colindex = colindex + u_color_ram_offset; \n"
 "    txcol = texelFetch( s_color,  ivec2( colindex ,0 )  , 0 );\n"
@@ -1881,11 +1899,14 @@ const GLchar Yglprg_vdp2_drawfb_cram_f[] =
 "uniform float u_to;\n"
 "in vec2 v_texcoord;\n"
 "out vec4 fragColor;\n"
+"int getLinePos( int dir ){\n"
+"  return int((u_vheight - gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"}\n"
 "void main()\n"
 "{\n"
 "  vec2 addr = v_texcoord;\n"
 "  highp vec4 fbColor = texture(s_vdp1FrameBuffer,addr);\n"
-"  int additional = int(round(fbColor.a * 255.0));\n"
+"  int additional = int(fbColor.a * 255.0);\n"
 "  if( (additional & 0x80) == 0 ){ discard; } // show? \n"
 "  int prinumber = (additional&0x07);\n"
 "  highp float depth = u_pri[ prinumber ];\n"
@@ -1893,7 +1914,7 @@ const GLchar Yglprg_vdp2_drawfb_cram_f[] =
 "  vec4 txcol=vec4(0.0,0.0,0.0,1.0);\n"
 "  if( (additional & 0x40) != 0 ){  // index color? \n"
 "    if( fbColor.b != 0.0 ) {discard;} // draw shadow last path \n"
-"    int colindex = ( int(round(fbColor.g*65280.0)) | int(round(fbColor.r*255.0)) ); \n"
+"    int colindex = ( int(fbColor.g*65280.0) | int(fbColor.r*255.0)); \n"
 "    if( colindex == 0 ){ if( u_sprite_window != 0 || prinumber == 0) { discard;} } // hard/vdp1/hon/p02_11.htm 0 data is ignoerd \n"
 "    colindex = colindex + u_color_ram_offset; \n"
 "    txcol = texelFetch( s_color,  ivec2( colindex ,0 )  , 0 );\n"
@@ -1929,84 +1950,84 @@ const GLchar Yglprg_vdp2_drawfb_cram_msb_color_add_f[]   = " if( txcol.a != 0.0 
 const GLchar Yglprg_vdp2_drawfb_line_blend_f[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((u_vheight - gl_FragCoord.y-u_viewport_offset ) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );\n"
 "  fragColor = (fragColor*fragColor.a) + lncol*(1.0-fragColor.a); \n";
 
 const GLchar Yglprg_vdp2_drawfb_line_add_f[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((u_vheight - gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );\n"
 "  fragColor =  fragColor + lncol * fragColor.a ;  \n";
 
 const GLchar Yglprg_vdp2_drawfb_cram_less_line_dest_alpha_f[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((u_vheight - gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );      \n"
 "  if( depth <= u_cctl ){ fragColor = (fragColor*(1.0-lncol.a)) + lncol*lncol.a; } \n";
 
 const GLchar Yglprg_vdp2_drawfb_cram_equal_line_dest_alpha_f[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((u_vheight - gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );      \n"
 "  if( depth == u_cctl ){ fragColor = (fragColor*(1.0-lncol.a)) + lncol*lncol.a; } \n";
 
 const GLchar Yglprg_vdp2_drawfb_cram_more_line_dest_alpha_f[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((u_vheight - gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );      \n"
 "  if( depth >= u_cctl ){ fragColor = (fragColor*(1.0-lncol.a)) + lncol*lncol.a; } \n";
 
 const GLchar Yglprg_vdp2_drawfb_cram_msb_line_dest_alpha_f[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((u_vheight - gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );      \n"
 "  if( txcol.a != 0.0 ){ fragColor = (fragColor*(1.0-lncol.a)) + lncol*lncol.a; }\n";
 
 const GLchar Yglprg_vdp2_drawfb_line_blend_fv[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int(( gl_FragCoord.y-u_viewport_offset ) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );\n"
 "  fragColor = (fragColor*fragColor.a) + lncol*(1.0-fragColor.a); \n";
 
 const GLchar Yglprg_vdp2_drawfb_line_add_fv[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );\n"
 "  fragColor =  fragColor + lncol * fragColor.a ;  \n";
 
 const GLchar Yglprg_vdp2_drawfb_cram_less_line_dest_alpha_fv[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );      \n"
 "  if( depth <= u_cctl ){ fragColor = (fragColor*lncol.a) + lncol*(1.0-lncol.a); } \n";
 
 const GLchar Yglprg_vdp2_drawfb_cram_equal_line_dest_alpha_fv[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );      \n"
 "  if( depth == u_cctl ){ fragColor = (lncol*lncol.a) + fragColor*(1.0-lncol.a); } \n";
 
 const GLchar Yglprg_vdp2_drawfb_cram_more_line_dest_alpha_fv[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );      \n"
 "  if( depth >= u_cctl ){ fragColor =(fragColor*lncol.a) + lncol*(1.0-lncol.a); } \n";
 
 const GLchar Yglprg_vdp2_drawfb_cram_msb_line_dest_alpha_fv[] =
 "  ivec2 linepos; \n "
 "  linepos.y = 0; \n "
-"  linepos.x = int((gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"  linepos.x = getLinePos(u_dir);\n"
 "  vec4 lncol = texelFetch( s_line, linepos,0 );      \n"
 "  if( txcol.a != 0.0 ){ fragColor = (fragColor*lncol.a) + lncol*(1.0-lncol.a); }\n";
 
@@ -2019,10 +2040,90 @@ const GLchar Yglprg_vdp2_drawfb_cram_eiploge_vulkan_f[] =
 "}\n";
 
 
+
 /*------------------------------------------------------------------------------------
 *  VDP2 Draw Frame buffer Operation( Perline color offset using hblankin )
 *  Chaos Seed
 * ----------------------------------------------------------------------------------*/
+#if 1
+const GLchar Yglprg_vdp2_drawfb_hblank_vulkan_f[] =
+#if defined(_OGLES3_)
+"#version 310 es \n"
+"precision highp sampler2D; \n"
+"precision highp float;\n"
+#else
+"#version 430 \n"
+#endif
+"layout(binding = 0) uniform vdp2regs { \n"
+" mat4 matrix; \n"
+" float u_pri[8]; \n"
+" float u_alpha[8]; \n"
+" vec4 u_coloroffset;\n"
+" float u_cctl; \n"
+" float u_emu_height; \n"
+" float u_vheight; \n"
+" int u_color_ram_offset; \n"
+" float u_viewport_offset; \n"
+" int u_sprite_window; \n"
+" float u_from;\n"
+" float u_to;\n"
+" int u_dir;\n"
+"}; \n"
+"layout(binding = 1) uniform highp sampler2D s_vdp1FrameBuffer;\n"
+"layout(binding = 2) uniform sampler2D s_color; \n"
+"layout(binding = 3) uniform sampler2D s_line; \n"
+"layout(location = 0) in vec2 v_texcoord;\n"
+"layout(location = 0) out vec4 fragColor;\n"
+"int getLinePos( int dir ){\n"
+"  switch(dir){\n"
+"    case 1: // 90\n"
+"      return int((u_vheight - gl_FragCoord.x-u_viewport_offset) * u_emu_height);\n"
+"      break;\n"
+"    case 2: // 270\n"
+"      return int((gl_FragCoord.x-u_viewport_offset) * u_emu_height);\n"
+"      break;\n"
+"    case 3: // 180\n"
+"      return int((u_vheight - gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"      break;\n"
+"    default:\n"
+"      return int((gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
+"      break;\n"
+"  }\n"
+"  return 0;\n"
+"}\n"
+"void main()\n"
+"{\n"
+"  ivec2 linepos; \n "
+"  linepos.y = 0; \n "
+"  linepos.x = getLinePos(u_dir);\n"
+"  vec4 linetex = texelFetch( s_line, linepos,0 ); "
+"  vec2 addr = v_texcoord;\n"
+"  highp vec4 fbColor = texture(s_vdp1FrameBuffer,addr);\n"
+"  int additional = int(fbColor.a * 255.0);\n"
+"  if( (additional & 0x80) == 0 ){ discard; } // show? \n"
+"  highp vec4 linepri = texelFetch( s_line, ivec2(linepos.x,1+(additional&0x07)) ,0 ); \n"
+"  if( linepri.a == 0.0 ) discard; \n"
+"  highp float depth = ((linepri.a*255.0)/10.0)+0.05 ;\n"
+"  if( depth < u_from || depth > u_to ){ discard; } \n"
+"  vec4 txcol=vec4(0.0,0.0,0.0,1.0);\n"
+"  if( (additional & 0x40) != 0 ){  // index color? \n"
+"    if( fbColor.b != 0.0 ) {discard;} // draw shadow last path \n"
+"    int colindex = ( int(fbColor.g*65280.0) | int(fbColor.r*255.0)); \n"
+"    if( colindex == 0 ){ if( u_sprite_window != 0 || (additional&0x07) == 0 ) { discard;} } // hard/vdp1/hon/p02_11.htm 0 data is ignoerd \n"
+"    colindex = colindex + u_color_ram_offset; \n"
+"    txcol = texelFetch( s_color,  ivec2( colindex ,0 )  , 0 );\n"
+"    fragColor = txcol;\n"
+"  }else{ // direct color \n"
+"    if(u_sprite_window == 0 ){ \n"
+"       fragColor = fbColor;\n"
+"    }else{\n"
+"       if( fbColor.r == 0.0 && fbColor.g == 0.0 && fbColor.b == 0.0 ){ discard; }else{ fragColor = fbColor; }  \n"
+"    }"
+"  } \n"
+"  fragColor.r = clamp( fragColor.r+(linetex.r-0.5)*2.0,0.0,1.0);      \n"
+"  fragColor.g = clamp( fragColor.g+(linetex.g-0.5)*2.0,0.0,1.0);      \n"
+"  fragColor.b = clamp( fragColor.b+(linetex.b-0.5)*2.0,0.0,1.0);      \n";
+#else
 const GLchar Yglprg_vdp2_drawfb_hblank_vulkan_f[] =
 #if defined(_OGLES3_)
 "#version 310 es \n"
@@ -2052,23 +2153,18 @@ const GLchar Yglprg_vdp2_drawfb_hblank_vulkan_f[] =
 "layout(location = 0) out vec4 fragColor;\n"
 "void main()\n"
 "{\n"
-"  ivec2 linepos; \n "
-"  linepos.y = 0; \n "
-"  linepos.x = int((gl_FragCoord.y-u_viewport_offset) * u_emu_height);\n"
-"  vec4 linetex = texelFetch( s_line, linepos,0 ); "
 "  vec2 addr = v_texcoord;\n"
 "  highp vec4 fbColor = texture(s_vdp1FrameBuffer,addr);\n"
-"  int additional = int(round(fbColor.a * 255.0));\n"
+"  int additional = int(fbColor.a * 255.0);\n"
 "  if( (additional & 0x80) == 0 ){ discard; } // show? \n"
-"  highp vec4 linepri = texelFetch( s_line, ivec2(linepos.x,1+(additional&0x07)) ,0 ); \n"
-"  if( linepri.a == 0.0 ) discard; \n"
-"  highp float depth = ((linepri.a*255.0)/10.0)+0.05 ;\n"
+"  int prinumber = (additional&0x07);\n"
+"  highp float depth = u_pri[ prinumber ];\n"
 "  if( depth < u_from || depth > u_to ){ discard; } \n"
 "  vec4 txcol=vec4(0.0,0.0,0.0,1.0);\n"
 "  if( (additional & 0x40) != 0 ){  // index color? \n"
 "    if( fbColor.b != 0.0 ) {discard;} // draw shadow last path \n"
-"    int colindex = ( int(round(fbColor.g*65280.0)) | int(round(fbColor.r*255.0))); \n"
-"    if( colindex == 0 ){ if( u_sprite_window != 0 || (additional&0x07) == 0 ) { discard;} } // hard/vdp1/hon/p02_11.htm 0 data is ignoerd \n"
+"    int colindex = ( int(fbColor.g*65280.0) | int(fbColor.r*255.0)); \n"
+"    if( colindex == 0 ){ if( u_sprite_window != 0 || prinumber == 0) { discard;} } // hard/vdp1/hon/p02_11.htm 0 data is ignoerd \n"
 "    colindex = colindex + u_color_ram_offset; \n"
 "    txcol = texelFetch( s_color,  ivec2( colindex ,0 )  , 0 );\n"
 "    fragColor = txcol;\n"
@@ -2079,10 +2175,8 @@ const GLchar Yglprg_vdp2_drawfb_hblank_vulkan_f[] =
 "       if( fbColor.r == 0.0 && fbColor.g == 0.0 && fbColor.b == 0.0 ){ discard; }else{ fragColor = fbColor; }  \n"
 "    }"
 "  } \n"
-"  fragColor.r += (linetex.r-0.5)*2.0;      \n"
-"  fragColor.g += (linetex.g-0.5)*2.0;      \n"
-"  fragColor.b += (linetex.b-0.5)*2.0;      \n";
-
+"  fragColor += u_coloroffset;  \n";
+#endif
 
 const GLchar Yglprg_vdp2_drawfb_hblank_f[] =
 #if defined(_OGLES3_)
@@ -2118,7 +2212,7 @@ const GLchar Yglprg_vdp2_drawfb_hblank_f[] =
 "  vec4 linetex = texelFetch( s_line, linepos,0 ); "
 "  vec2 addr = v_texcoord;\n"
 "  highp vec4 fbColor = texture(s_vdp1FrameBuffer,addr);\n"
-"  int additional = int(round(fbColor.a * 255.0));\n"
+"  int additional = int(fbColor.a * 255.0);\n"
 "  if( (additional & 0x80) == 0 ){ discard; } // show? \n"
 "  highp vec4 linepri = texelFetch( s_line, ivec2(linepos.x,1+(additional&0x07)) ,0 ); \n"
 "  if( linepri.a == 0.0 ) discard; \n"
@@ -2127,7 +2221,7 @@ const GLchar Yglprg_vdp2_drawfb_hblank_f[] =
 "  vec4 txcol=vec4(0.0,0.0,0.0,1.0);\n"
 "  if( (additional & 0x40) != 0 ){  // index color? \n"
 "    if( fbColor.b != 0.0 ) {discard;} // draw shadow last path \n"
-"    int colindex = ( int(round(fbColor.g*65280.0)) | int(round(fbColor.r*255.0)) ); \n"
+"    int colindex = ( int(fbColor.g*65280.0) | int(fbColor.r*255.0)); \n"
 "    if( colindex == 0 ){ if( u_sprite_window != 0 || (additional&0x07) == 0 ) { discard;} } // hard/vdp1/hon/p02_11.htm 0 data is ignoerd \n"
 "    colindex = colindex + u_color_ram_offset; \n"
 "    txcol = texelFetch( s_color,  ivec2( colindex ,0 )  , 0 );\n"
@@ -2246,7 +2340,7 @@ const GLchar Yglprg_vdp2_drawfb_shadow_f[] =
 "{\n"
 "  vec2 addr = v_texcoord;\n"
 "  highp vec4 fbColor = texture(s_vdp1FrameBuffer,addr);\n"
-"  int additional = int(round(fbColor.a * 255.0));\n"
+"  int additional = int(fbColor.a * 255.0);\n"
 "  if( (additional & 0x80) == 0 ){ discard; } // show? \n"
 "  highp float depth = u_pri[ (additional&0x07) ];\n"
 "  if( (additional & 0x40) != 0 && fbColor.b != 0.0 ){  // index color and shadow? \n"
@@ -2702,7 +2796,7 @@ const GLchar Yglprg_vdp2_drawfb_addcolor_shadow_f[] =
 "{\n"
 "  vec2 addr = v_texcoord;\n"
 "  highp vec4 fbColor = texture(s_vdp1FrameBuffer,addr);\n"
-"  highp int additional = int(round(fbColor.a * 255.0));\n"
+"  highp int additional = int(fbColor.a * 255.0);\n"
 "  highp float alpha = float((additional/8)*8)/255.0;\n"
 "  highp float depth = ((float(additional&0x07))/10.0) + 0.05;\n"
 "  if( depth < u_from || depth > u_to ){ discard;return;}\n"
@@ -2808,12 +2902,12 @@ const GLchar Yglprg_linecol_destalpha_f[] =
 "    fragColor.a =txcol.a;\n";
 
 const GLchar Yglprg_linecol_main_cram_f[] =
-"    vec4 txcolc = texelFetch( s_color,  ivec2( ( int(round(txcol.g*65280.0)) | int(round(txcol.r*255.0)) ) ,0 )  , 0 );\n"
+"    vec4 txcolc = texelFetch( s_color,  ivec2( ( int(txcol.g*65280.0) | int(txcol.r*255.0)) ,0 )  , 0 );\n"
 "    fragColor = txcolc+u_color_offset+lncol;\n"
 "    fragColor.a = 1.0;\n";
 
 const GLchar Yglprg_linecol_destalpha_cram_f[] =
-"    vec4 txcolc = texelFetch( s_color,  ivec2( ( int(round(txcol.g*65280.0)) | int(round(txcol.r*255.0)) ) ,0 )  , 0 );\n"
+"    vec4 txcolc = texelFetch( s_color,  ivec2( ( int(txcol.g*65280.0) | int(txcol.r*255.0)) ,0 )  , 0 );\n"
 "    fragColor = (txcolc * (1.0-lncol.a))+(lncol*lncol.a)+u_color_offset;\n"
 "    fragColor.a =txcol.a;\n";
 
@@ -5033,3 +5127,4 @@ int YglBlitScanlineFilter(u32 sourceTexture, u32 draw_res_v, u32 staturn_res_v) 
 
   return 0;
 }
+
