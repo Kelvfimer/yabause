@@ -3655,6 +3655,8 @@ void YglUpdateVdp2Reg()
   {
     _Ygl->fbu_.u_sprite_window = 0;
   }
+  
+  _Ygl->fbu_.u_dir = 0;
 
   if (_Ygl->framebuffer_uniform_id_ == 0)
   {
