@@ -118,6 +118,7 @@ void YabThreadUSleep( unsigned int stime );
 
 int YabCopyFile(const char * src, const char * dst);
 int YabMakeCleanDir( const char * dirname );
+#include <core.h>
 int YabNanosleep(u64 ns);
 
 ///////////////////////////////////////////////////////////////////////////
