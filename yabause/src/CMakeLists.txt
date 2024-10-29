@@ -195,6 +195,7 @@ if (YAB_USE_SSF)
 
   if (ZLIB_FOUND)
     add_definitions(-DYAB_WANT_SSF=1)
+    set( CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wno-error=incompatible-pointer-types -Wno-int-conversion -Wno-implicit-function-declaration -D_LARGEFILE_SOURCE" )
     include_directories(${ZLIB_INCLUDE_DIRS})
     set(YABAUSE_LIBRARIES ${YABAUSE_LIBRARIES} ${ZLIB_LIBRARIES})
 
