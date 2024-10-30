@@ -31,22 +31,10 @@ include( ${CMAKE_SOURCE_DIR}/CMake/Packages/external_libpng.cmake )
 ExternalProject_Add(
      Json
      PREFIX ${CMAKE_CURRENT_BINARY_DIR}/Json
-     GIT_REPOSITORY https://github.com/nlohmann/json.git
-     # For shallow git clone (without downloading whole history)
-     #GIT_SHALLOW 1
-     # For point at certain tag
-     GIT_TAG v3.2.0
-     #disables auto update on every build
-     UPDATE_DISCONNECTED 1
+     URL https://github.com/nlohmann/json/archive/v3.2.0.zip
      #disable following
      CONFIGURE_COMMAND "" BUILD_COMMAND "" INSTALL_DIR "" INSTALL_COMMAND ""
      )
- # Update json target
- add_custom_target(external-Json-update
-     COMMENT "Updated Nlohmann/Json"
-     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/Json/src/Json
-     COMMAND ${GIT_EXECUTABLE} pull
-     DEPENDS Json)
 # set include directory
 set(EXTERNAL_JSON_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/Json/src/Json/single_include")
 
