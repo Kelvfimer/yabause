@@ -188,7 +188,7 @@ OSD_struct *OSDCoreList[] = {
 static SDL_Window* wnd;
 static SDL_GLContext glc;
 int g_EnagleFPS = 1;
-int g_resolution_mode = 0;
+int g_resolution_mode = 3;
 int g_keep_aspect_rate = 0;
 int g_scsp_sync = 1;
 int g_frame_skip = 0;

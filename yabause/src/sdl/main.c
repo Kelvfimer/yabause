@@ -141,7 +141,7 @@ NULL
 #endif
 
 static int fullscreen = 0;
-static int lowres_mode = 0;
+static int lowres_mode = 1;
 
 static char biospath[256] = "\0";
 static char cdpath[256] = "\0";
