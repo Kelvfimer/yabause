@@ -36,7 +36,6 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
 
 #if defined(_OGLES3_)
 #include <GLES3/gl3.h>
-#include <GLES3/gl3ext.h>
 #else
 #include "ygl.h"
 #endif

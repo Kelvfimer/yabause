@@ -50,7 +50,6 @@ extern "C" {
     #include <glsm/glsm.h>
 #elif defined(__ANDROID__)
     #include <GLES3/gl31.h>
-    #include <GLES3/gl3ext.h>
     #include <EGL/egl.h>
 
 
