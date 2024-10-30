@@ -265,7 +265,7 @@ int yabauseinit()
 
   yinit.use_cpu_affinity = 1;
 
-  yinit.use_sh2_cache = 1;
+  yinit.use_sh2_cache = 0;
 
   res = YabauseInit(&yinit);
   if( res == -1) {
